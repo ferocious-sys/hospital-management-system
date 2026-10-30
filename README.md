@@ -28,7 +28,7 @@ An educational, console-based hospital operations starter, modeled on the refere
    python -m pip install -r requirements.txt
    ```
 
-4. Configure connection settings. Defaults are `127.0.0.1:3306`, database `hospital_management`, user `root`, and a blank password. Prefer environment variables over editing source:
+4. Configure connection settings. Defaults are `127.0.0.1:3306`, database `hospital_management`, and user `root`. If `HMS_DB_PASSWORD` is not set, the app asks for the MySQL password in a hidden terminal prompt and remembers it only for that app session. You can also supply connection settings through environment variables:
 
    **Windows PowerShell**
    ```powershell
@@ -112,20 +112,23 @@ The script writes `Hospital_Management_System.zip` to the parent `outputs` folde
 
 ## Troubleshooting
 
+### `Database error: 1045 (28000): Access denied for user 'root'@'localhost' (using password: NO)`
+
+The app did not receive a password. Run the updated `app.py` in a terminal; it will ask for the MySQL password and hide what you type. The password is kept only in the running app process. If you start the app from an IDE, run it in the IDE's terminal so it can show the password prompt.
+
 ### `Database error: 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)`
 
-MySQL received a password but rejected it for the `root` account. The app reads `HMS_DB_PASSWORD` from its process environment; it does not automatically know the password configured for MySQL. Do not put your real password in this README or commit it to the repository.
+MySQL received a password but rejected it for the configured account. If the app prompted you, check that you entered the MySQL password correctly; it will prompt again after a rejected password. If you set `HMS_DB_PASSWORD`, check that it is correct and restart the app. Do not put your real password in this README or commit it to the repository.
 
-On Windows, run the app from PowerShell and enter the MySQL root password at the hidden prompt:
+On Windows PowerShell, you can instead set the password for that session and run the app:
 
 ```powershell
 Set-Location "C:\path\to\Hospital_Management_System"
-$secure = Read-Host "MySQL root password" -AsSecureString
-$env:HMS_DB_PASSWORD = [System.Net.NetworkCredential]::new("", $secure).Password
+$env:HMS_DB_PASSWORD = Read-Host "MySQL root password" -AsSecureString | ForEach-Object { [System.Net.NetworkCredential]::new("", $_).Password }
 python .\app.py
 ```
 
-The environment variable lasts only for that PowerShell session. If you use IDLE, launch IDLE from the same PowerShell session after setting the variable, or restart IDLE so it inherits the updated environment. To verify the password independently, run `mysql -u root -p` and enter it at MySQL's prompt.
+The environment variable lasts only for that PowerShell session. To verify the password independently, run `mysql -u root -p` and enter it at MySQL's prompt.
 
 ### `Database error: 1049 (42000): Unknown database 'hospital_management'`
 

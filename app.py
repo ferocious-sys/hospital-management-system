@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from getpass import getpass
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 
@@ -9,14 +10,30 @@ import mysql.connector
 from mysql.connector import Error
 
 
+_db_password = os.getenv("HMS_DB_PASSWORD") or None
+
+
 def connect_db():
-    return mysql.connector.connect(
-        host=os.getenv("HMS_DB_HOST", "127.0.0.1"),
-        port=int(os.getenv("HMS_DB_PORT", "3306")),
-        user=os.getenv("HMS_DB_USER", "root"),
-        password=os.getenv("HMS_DB_PASSWORD", ""),
-        database=os.getenv("HMS_DB_NAME", "hospital_management"),
-    )
+    global _db_password
+    host = os.getenv("HMS_DB_HOST", "127.0.0.1")
+    user = os.getenv("HMS_DB_USER", "root")
+    configured_password = os.getenv("HMS_DB_PASSWORD")
+    password = configured_password or _db_password
+    if password is None:
+        password = getpass(f"MySQL password for {user}@{host}: ")
+        _db_password = password
+    try:
+        return mysql.connector.connect(
+            host=host,
+            port=int(os.getenv("HMS_DB_PORT", "3306")),
+            user=user,
+            password=password,
+            database=os.getenv("HMS_DB_NAME", "hospital_management"),
+        )
+    except Error as exc:
+        if getattr(exc, "errno", None) == 1045 and not configured_password:
+            _db_password = None
+        raise
 
 
 def ask_int(prompt: str, minimum: int = 1) -> int:
