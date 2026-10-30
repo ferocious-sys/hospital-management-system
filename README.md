@@ -109,3 +109,20 @@ To build a local ZIP containing the application, SQL schema, setup guide, and PD
 ```
 
 The script writes `Hospital_Management_System.zip` to the parent `outputs` folder. The build is intended for private local use; no patient data should be included.
+
+## Troubleshooting
+
+### `Database error: 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)`
+
+MySQL received a password but rejected it for the `root` account. The app reads `HMS_DB_PASSWORD` from its process environment; it does not automatically know the password configured for MySQL. Do not put your real password in this README or commit it to the repository.
+
+On Windows, run the app from PowerShell and enter the MySQL root password at the hidden prompt:
+
+```powershell
+Set-Location "C:\path\to\Hospital_Management_System"
+$secure = Read-Host "MySQL root password" -AsSecureString
+$env:HMS_DB_PASSWORD = [System.Net.NetworkCredential]::new("", $secure).Password
+python .\app.py
+```
+
+The environment variable lasts only for that PowerShell session. If you use IDLE, launch IDLE from the same PowerShell session after setting the variable, or restart IDLE so it inherits the updated environment. To verify the password independently, run `mysql -u root -p` and enter it at MySQL's prompt.
