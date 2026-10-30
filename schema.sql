@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS admissions (
   CONSTRAINT fk_admissions_doctor FOREIGN KEY (attending_doctor_id)
     REFERENCES doctors (doctor_id) ON UPDATE CASCADE ON DELETE RESTRICT,
   CONSTRAINT fk_admissions_bed FOREIGN KEY (bed_id)
-    REFERENCES beds (bed_id) ON UPDATE CASCADE ON DELETE RESTRICT
+    REFERENCES beds (bed_id) ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS bills (
@@ -155,4 +155,5 @@ INSERT IGNORE INTO beds (ward, room_no, bed_no, bed_type) VALUES
   ('General Ward', 'G-101', '1', 'general'),
   ('General Ward', 'G-101', '2', 'general'),
   ('Critical Care', 'ICU-01', '1', 'icu');
+
 

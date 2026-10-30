@@ -137,3 +137,7 @@ cd /d "C:\path\to\Hospital_Management_System"
 ```
 
 Enter the MySQL root password when prompted. The schema creates `hospital_management` and inserts fictional demo departments, doctors, and beds. Then restart `app.py` and try **List patients** again.
+
+### `ERROR 1215 (HY000) at line 84: Cannot add foreign key constraint`
+
+Use the current `schema.sql` from this repository. The admission table has a generated active-bed column based on `bed_id`; MySQL does not allow `ON UPDATE CASCADE` on a foreign key for that base column, so the bed relationship uses `RESTRICT` instead. If an earlier import stopped at this error, rerun the full schema command above. The script uses `CREATE TABLE IF NOT EXISTS` and duplicate-safe demo inserts, so it can finish the missing tables without dropping the database.
