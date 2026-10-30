@@ -126,3 +126,14 @@ python .\app.py
 ```
 
 The environment variable lasts only for that PowerShell session. If you use IDLE, launch IDLE from the same PowerShell session after setting the variable, or restart IDLE so it inherits the updated environment. To verify the password independently, run `mysql -u root -p` and enter it at MySQL's prompt.
+
+### `Database error: 1049 (42000): Unknown database 'hospital_management'`
+
+The MySQL server accepted the connection, but the project schema has not been loaded yet. Import `schema.sql` once to create the database and its tables. In Windows Command Prompt (`cmd.exe`), run these commands from the project folder:
+
+```cmd
+cd /d "C:\path\to\Hospital_Management_System"
+"C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe" -u root -p < schema.sql
+```
+
+Enter the MySQL root password when prompted. The schema creates `hospital_management` and inserts fictional demo departments, doctors, and beds. Then restart `app.py` and try **List patients** again.
